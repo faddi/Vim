@@ -1411,14 +1411,20 @@ export class PutCommand extends BaseCommand {
           .join('\n');
       }
 
-      if (after) {
+      const isTextMultiline = text.indexOf('\n') !== -1;
+
+      if (isTextMultiline) {
         // P insert before current line
-        textToAdd = text + '\n';
-        whereToAddText = dest.getLineBegin();
+        if (after) {
+          textToAdd = text + '\n';
+          whereToAddText = dest.getLineBegin();
+        } else {
+          textToAdd = '\n' + text;
+          whereToAddText = dest.getLineEnd();
+        }
       } else {
-        // p paste after current line
-        textToAdd = '\n' + text;
-        whereToAddText = dest.getLineEnd();
+        textToAdd = text;
+        whereToAddText = after ? position : position.getRight();
       }
     }
 
