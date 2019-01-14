@@ -1323,6 +1323,29 @@ export class PutCommand extends BaseCommand {
     return register.text as string;
   }
 
+  /**
+   * checks if text contains any '\n' not preceded by a '\'
+   */
+  private isMultilineText(text: string) {
+    for (let i = 0; i < text.length; i++) {
+      // check if prev and next are within text length
+      if (i - 1 < 0 || i + 1 >= text.length) {
+        continue;
+      }
+
+      const prev = text[i - 1];
+      const current = text[i];
+      const next = text[i + 1];
+
+      // if we're at a "non-escaped" newline the text is multiline
+      if (current === '\\' && next === 'n' && prev !== '\\') {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   public async exec(
     position: Position,
     vimState: VimState,
@@ -1400,9 +1423,7 @@ export class PutCommand extends BaseCommand {
           .join('\n');
       }
 
-      const isTextMultiline = text.indexOf('\n') !== -1;
-
-      if (isTextMultiline) {
+      if (this.isMultilineText(text)) {
         // P insert before current line
         if (after) {
           textToAdd = text + '\n';
@@ -1412,8 +1433,16 @@ export class PutCommand extends BaseCommand {
           whereToAddText = dest.getLineEnd();
         }
       } else {
-        textToAdd = text;
-        whereToAddText = after ? position : position.getRight();
+        if (register.registerMode === RegisterMode.LineWise) {
+          const left = !noPrevLine && noNextLine ? '\n' : '';
+          const right = noNextLine ? '' : '\n';
+          textToAdd = left + text + right;
+
+          whereToAddText = dest;
+        } else {
+          textToAdd = text;
+          whereToAddText = after ? position : position.getRight();
+        }
       }
     }
 
@@ -1466,9 +1495,9 @@ export class PutCommand extends BaseCommand {
       if (text.indexOf('\n') === -1) {
         if (!position.isLineEnd()) {
           if (after) {
-            diff = new PositionDiff(0, -1);
+            diff = new PositionDiff(0, -1 * text.length);
           } else {
-            diff = new PositionDiff(0, textToAdd.length);
+            diff = new PositionDiff(0, 1);
           }
         }
       } else {
