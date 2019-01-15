@@ -44,4 +44,18 @@ suite('put operator', () => {
     keysPressed: '2yyjjpk',
     end: ['one', 'two', '|three', 'one', 'two', 'four'],
   });
+
+  newTest({
+    title: 'test visual block single line p',
+    start: ['12|345'],
+    keysPressed: '<C-v>llyhp',
+    end: ['12|345345'],
+  });
+
+  newTest({
+    title: 'test visual block single line P',
+    start: ['12|345'],
+    keysPressed: '<C-v>llyhP',
+    end: ['1|3452345'],
+  });
 });
