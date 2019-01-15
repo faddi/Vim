@@ -17,7 +17,7 @@ export enum RegisterMode {
   BlockWise,
 }
 
-export type RegisterContentOrigin = 'yank' | 'delete';
+export type RegisterContentOrigin = 'visual-block-yank';
 
 export type RegisterContent = string | string[] | RecordedState;
 
@@ -80,8 +80,8 @@ export class Register {
   public static put(
     content: RegisterContent,
     vimState: VimState,
-    contentOrigin?: RegisterContentOrigin,
-    multicursorIndex?: number
+    multicursorIndex?: number,
+    contentOrigin?: RegisterContentOrigin
   ): void {
     const register = vimState.recordedState.registerName;
 

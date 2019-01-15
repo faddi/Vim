@@ -1473,17 +1473,19 @@ export class PutCommand extends BaseCommand {
       }
     } else {
       if (text.indexOf('\n') === -1) {
-        if (!position.isLineEnd() && register.contentOrigin === 'yank') {
-          if (after) {
-            diff = new PositionDiff(0, -1 * text.length);
+        if (!position.isLineEnd()) {
+          if (register.contentOrigin === 'visual-block-yank') {
+            if (after) {
+              diff = new PositionDiff(0, -1 * text.length);
+            } else {
+              diff = new PositionDiff(0, 1);
+            }
           } else {
-            diff = new PositionDiff(0, 1);
-          }
-        } else {
-          if (after) {
-            diff = new PositionDiff(0, -1);
-          } else {
-            diff = new PositionDiff(0, textToAdd.length);
+            if (after) {
+              diff = new PositionDiff(0, -1);
+            } else {
+              diff = new PositionDiff(0, textToAdd.length);
+            }
           }
         }
       } else {
