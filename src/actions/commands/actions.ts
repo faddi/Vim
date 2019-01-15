@@ -1411,14 +1411,18 @@ export class PutCommand extends BaseCommand {
           .join('\n');
       }
 
-      if (after) {
+      if (register.registerMode === RegisterMode.LineWise) {
         // P insert before current line
-        textToAdd = text + '\n';
-        whereToAddText = dest.getLineBegin();
+        if (after) {
+          textToAdd = text + '\n';
+          whereToAddText = dest.getLineBegin();
+        } else {
+          textToAdd = '\n' + text;
+          whereToAddText = dest.getLineEnd();
+        }
       } else {
-        // p paste after current line
-        textToAdd = '\n' + text;
-        whereToAddText = dest.getLineEnd();
+        textToAdd = text;
+        whereToAddText = after ? position : position.getRight();
       }
     }
 
@@ -1470,10 +1474,18 @@ export class PutCommand extends BaseCommand {
     } else {
       if (text.indexOf('\n') === -1) {
         if (!position.isLineEnd()) {
-          if (after) {
-            diff = new PositionDiff(0, -1);
+          if (register.contentOrigin === 'visual-block-yank') {
+            if (after) {
+              diff = new PositionDiff(0, -1 * text.length);
+            } else {
+              diff = new PositionDiff(0, 1);
+            }
           } else {
-            diff = new PositionDiff(0, textToAdd.length);
+            if (after) {
+              diff = new PositionDiff(0, -1);
+            } else {
+              diff = new PositionDiff(0, textToAdd.length);
+            }
           }
         }
       } else {
