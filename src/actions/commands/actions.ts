@@ -1474,7 +1474,10 @@ export class PutCommand extends BaseCommand {
     } else {
       if (text.indexOf('\n') === -1) {
         if (!position.isLineEnd()) {
-          if (register.contentOrigin === 'visual-block-yank') {
+          if (
+            register.contentOrigin === 'visual-block-yank' ||
+            register.contentOrigin === 'visual-block-delete'
+          ) {
             if (after) {
               diff = new PositionDiff(0, -1 * text.length);
             } else {
@@ -3616,13 +3619,19 @@ class ActionXVisualBlock extends BaseCommand {
   }
 
   public async exec(position: Position, vimState: VimState): Promise<VimState> {
-    for (const { start, end } of Position.IterateLine(vimState)) {
+    const lines: string[] = [];
+
+    for (const { line, start, end } of Position.IterateLine(vimState)) {
+      lines.push(line);
       vimState.recordedState.transformations.push({
         type: 'deleteRange',
         range: new Range(start, end),
         manuallySetCursorPositions: true,
       });
     }
+
+    const text = lines.length === 1 ? lines[0] : lines.join('\n');
+    Register.put(text, vimState, this.multicursorIndex, 'visual-block-delete');
 
     const topLeft = VisualBlockMode.getTopLeftPosition(
       vimState.cursorPosition,

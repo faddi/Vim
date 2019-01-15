@@ -46,16 +46,30 @@ suite('put operator', () => {
   });
 
   newTest({
-    title: 'test visual block single line p',
+    title: 'test visual block single line yank p',
     start: ['12|345'],
     keysPressed: '<C-v>llyhp',
     end: ['12|345345'],
   });
 
   newTest({
-    title: 'test visual block single line P',
+    title: 'test visual block single line yank P',
     start: ['12|345'],
     keysPressed: '<C-v>llyhP',
     end: ['1|3452345'],
+  });
+
+  newTest({
+    title: 'test visual block single line delete p',
+    start: ['12|345'],
+    keysPressed: '<C-v>lldhp',
+    end: ['1|3452'],
+  });
+
+  newTest({
+    title: 'test visual block single line delete P',
+    start: ['12|345'],
+    keysPressed: '<C-v>lldhP',
+    end: ['|34512'],
   });
 });

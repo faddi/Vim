@@ -17,7 +17,7 @@ export enum RegisterMode {
   BlockWise,
 }
 
-export type RegisterContentOrigin = 'visual-block-yank';
+export type RegisterContentOrigin = 'visual-block-yank' | 'visual-block-delete';
 
 export type RegisterContent = string | string[] | RecordedState;
 
