@@ -1475,8 +1475,7 @@ export class PutCommand extends BaseCommand {
       if (text.indexOf('\n') === -1) {
         if (!position.isLineEnd()) {
           if (
-            register.contentOrigin === 'visual-block-yank' ||
-            register.contentOrigin === 'visual-block-delete'
+            register.registerMode === RegisterMode.BlockWise
           ) {
             if (after) {
               diff = new PositionDiff(0, -1 * text.length);
@@ -3631,7 +3630,8 @@ class ActionXVisualBlock extends BaseCommand {
     }
 
     const text = lines.length === 1 ? lines[0] : lines.join('\n');
-    Register.put(text, vimState, this.multicursorIndex, 'visual-block-delete');
+    vimState.currentRegisterMode = RegisterMode.BlockWise;
+    Register.put(text, vimState, this.multicursorIndex);
 
     const topLeft = VisualBlockMode.getTopLeftPosition(
       vimState.cursorPosition,

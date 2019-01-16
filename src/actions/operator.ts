@@ -658,7 +658,9 @@ export class YankVisualBlockMode extends BaseOperator {
       }
     }
 
-    Register.put(toCopy, vimState, this.multicursorIndex, 'visual-block-yank');
+    vimState.currentRegisterMode = RegisterMode.BlockWise;
+
+    Register.put(toCopy, vimState, this.multicursorIndex);
 
     const numLinesYanked = toCopy.split('\n').length;
     ReportLinesYanked(numLinesYanked, vimState);

@@ -17,15 +17,12 @@ export enum RegisterMode {
   BlockWise,
 }
 
-export type RegisterContentOrigin = 'visual-block-yank' | 'visual-block-delete';
-
 export type RegisterContent = string | string[] | RecordedState;
 
 export interface IRegisterContent {
   text: RegisterContent;
   registerMode: RegisterMode;
   isClipboardRegister: boolean;
-  contentOrigin?: RegisterContentOrigin;
 }
 
 export class Register {
@@ -77,12 +74,7 @@ export class Register {
    * Puts content in a register. If none is specified, uses the default
    * register ".
    */
-  public static put(
-    content: RegisterContent,
-    vimState: VimState,
-    multicursorIndex?: number,
-    contentOrigin?: RegisterContentOrigin
-  ): void {
+  public static put(content: RegisterContent, vimState: VimState, multicursorIndex?: number): void {
     const register = vimState.recordedState.registerName;
 
     if (!Register.isValidRegister(register)) {
@@ -103,7 +95,7 @@ export class Register {
       if (Register.isValidUppercaseRegister(register)) {
         Register.appendNormalRegister(content, register, vimState);
       } else {
-        Register.putNormalRegister(content, register, vimState, contentOrigin);
+        Register.putNormalRegister(content, register, vimState);
       }
     }
   }
@@ -225,8 +217,7 @@ export class Register {
   private static putNormalRegister(
     content: RegisterContent,
     register: string,
-    vimState: VimState,
-    contentOrigin?: RegisterContentOrigin
+    vimState: VimState
   ): void {
     if (Register.isClipboardRegister(register)) {
       Clipboard.Copy(content.toString());
@@ -236,7 +227,6 @@ export class Register {
       text: content,
       registerMode: vimState.effectiveRegisterMode,
       isClipboardRegister: Register.isClipboardRegister(register),
-      contentOrigin: contentOrigin,
     };
 
     Register.processNumberedRegister(content, vimState);
@@ -412,7 +402,6 @@ export class Register {
         text: registerText,
         registerMode: Register.registers[lowercaseRegister].registerMode,
         isClipboardRegister: Register.registers[lowercaseRegister].isClipboardRegister,
-        contentOrigin: Register.registers[lowercaseRegister].contentOrigin,
       };
     }
   }
